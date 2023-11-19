@@ -1,0 +1,338 @@
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
+# For example, here's several helpful packages to load
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn import metrics
+
+
+
+data=pd.read_csv('/kaggle/input/heart-failure-prediction/heart.csv')
+
+
+
+data.head()
+
+
+data.shape
+
+
+data.tail()
+
+
+data.info()
+
+
+data.isnull().sum()
+
+
+data.replace({'Sex':{'M':0,'F':1}},inplace=True)
+data.replace({'ChestPainType':{'ATA':0,'NAP':1,'ASY':2,'TA':3}},inplace=True)
+data.replace({'RestingECG':{'Normal':0,'LVH':1,'ST':2}},inplace=True)
+data.replace({'ExerciseAngina':{'N':0,'Y':1}},inplace=True)
+data.replace({'ST_Slope':{'Up':0,'Flat':1,'Down':2}},inplace=True)
+
+
+data.head()
+
+
+data.tail()
+
+
+data.describe()
+
+
+data['HeartDisease'].value_counts()
+
+
+x=data.drop(columns='HeartDisease',axis=1)
+y=data['HeartDisease']
+
+
+print(x)
+
+
+print(y)
+
+
+sns.set()
+plt.figure(figsize=(6,6))
+sns.distplot(data['Age'])
+plt.title('AgeGraph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.countplot(x='Sex',data=data)
+plt.title('SexGraph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['ChestPainType'])
+plt.title('CPT Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['RestingBP'])
+plt.title('RBP Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['Cholesterol'])
+plt.title('Cholesterol Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['FastingBS'])
+plt.title('FBS Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['RestingECG'])
+plt.title('RestingECG Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['MaxHR'])
+plt.title('MaxHR Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['ExerciseAngina'])
+plt.title('ExerciseAngina Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['Oldpeak'])
+plt.title('Oldpeak Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(data['ST_Slope'])
+plt.title('ST_Slope Graph')
+plt.show()
+
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,stratify=y,random_state=2)
+print(x.shape,x_train.shape,x_test.shape)
+
+
+odel=LogisticRegression()
+
+
+
+model.fit(x_train,y_train)
+
+
+x_train_prediction=model.predict(x_train)
+training_data_accuracy=accuracy_score(x_train_prediction,y_train)
+print('accuracy on training data :',training_data_accuracy)x_test_prediction=model.predict(x_test)
+
+
+
+test_data_accuracy=accuracy_score(x_test_prediction,y_test)
+print('accuracy on testing data :',test_data_accuracy)
+
+
+input_data=(45,0,3,110,264,0,0,132,0,1.2,1)
+input_data_as_numpy_array=np.asarray(input_data)
+input_data_reshaped=input_data_as_numpy_array.reshape(1,-1)
+prediction=model.predict(input_data_reshaped)
+print(prediction)
+
+if(prediction[0]==0):
+    print('The Person Does Not Have Heart Disease')
+else:
+    print('The Person Has Heart Disease')
+
+
+input_data=(40,0,0,140,289,0,0,172,0,0.0,0)
+input_data_as_numpy_array=np.asarray(input_data)
+input_data_reshaped=input_data_as_numpy_array.reshape(1,-1)
+prediction=model.predict(input_data_reshaped)
+print(prediction)
+
+
+if(prediction[0]==0):
+    print('The Person Does Not Have Heart Disease')
+else:
+    print('The Person Has Heart Disease')
+
+
+y_train
+
+
+from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
+
+svm=SVR()
+svm.fit(x_train,y_train)
+rf=RandomForestRegressor()
+rf.fit(x_train,y_train)
+gr=GradientBoostingRegressor()
+gr.fit(x_train,y_train)
+
+
+y_pred1=svm.predict(x_test)
+y_pred2=rf.predict(x_test)
+y_pred3=gr.predict(x_test)
+df1=pd.DataFrame({'Actual':y_test,'svm':y_pred1,'rf':y_pred2,'gr':y_pred3})
+df1
+
+
+plt.subplot(221)
+plt.plot(df1['Actual'].iloc[0:11],label='Actual')
+plt.plot(df1['svm'].iloc[0:11],label="svr")
+plt.tight_layout()
+plt.legend()
+
+
+plt.subplot(222)
+plt.plot(df1['Actual'].iloc[0:11],label='Actual')
+plt.plot(df1['rf'].iloc[0:11],label="rf")
+plt.tight_layout()
+plt.legend()
+
+
+plt.subplot(223)
+plt.plot(df1['Actual'].iloc[0:11],label='Actual')
+plt.plot(df1['gr'].iloc[0:11],label="gr")
+plt.tight_layout()
+plt.legend()
+
+
+score1=metrics.r2_score(y_test,y_pred1)
+score2=metrics.r2_score(y_test,y_pred2)
+score3=metrics.r2_score(y_test,y_pred3)
+print(score1,score2,score3)
+
+
+s1=metrics.mean_absolute_error(y_test,y_pred1)
+s2=metrics.mean_absolute_error(y_test,y_pred2)
+s3=metrics.mean_absolute_error(y_test,y_pred3)
+print(s1,s2,s3)
+
+
+data={'Age':40,
+     'Sex':0,
+     'ChestPainType':0,
+     'RestingBP':140,
+     'Cholesterol':289,
+     'FastingBS':0,
+     'RestingECG':0,
+     'MaxHR':172,
+     'ExerciseAngina':0,
+     'Oldpeak':0.0,
+     'ST_Slope':0}
+df=pd.DataFrame(data,index=[0])
+df
+
+
+new_pred=gr.predict(df)
+print(new_pred)
+
+
+data={'Age':40,
+     'Sex':0,
+     'ChestPainType':0,
+     'RestingBP':140,
+     'Cholesterol':289,
+     'FastingBS':0,
+     'RestingECG':0,
+     'MaxHR':172,
+     'ExerciseAngina':0,
+     'Oldpeak':0.0,
+     'ST_Slope':0}
+df=pd.DataFrame(data,index=[0])
+df
+
+
+new_pred=rf.predict(df)
+print(new_pred)
+
+
+data={'Age':40,
+     'Sex':0,
+     'ChestPainType':0,
+     'RestingBP':140,
+     'Cholesterol':289,
+     'FastingBS':0,
+     'RestingECG':0,
+     'MaxHR':172,
+     'ExerciseAngina':0,
+     'Oldpeak':0.0,
+     'ST_Slope':0}
+df=pd.DataFrame(data,index=[0])
+df
+
+
+new_pred=svm.predict(df)
+print(new_pred)
+
+
+gr=GradientBoostingRegressor()
+gr.fit(x,y)
+
+
+import joblib
+joblib.dump(gr,'model_joblib_gr')
+
+
+model1=joblib.load('model_joblib_gr')
+model1.predict(df)
+
+
+rf=RandomForestRegressor()
+rf.fit(x,y)
+
+
+joblib.dump(rf,'model_joblib_rf')
+
+
+model2=joblib.load('model_joblib_rf')
+model2.predict(df)
+
+
+svm= SVR()
+svm.fit(x,y)
+
+
+joblib.dump(svm,'model_joblib_svm')
+
+
+model3=joblib.load('model_joblib_svm')
+model3.predict(df)
+
+
